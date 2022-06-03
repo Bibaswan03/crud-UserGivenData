@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'
 import * as mutations from "./graphql/mutations";
 import * as queries from "./graphql/queries";
 import './App.css';
@@ -6,75 +6,106 @@ import Amplify, { API, graphqlOperation } from 'aws-amplify';
 import awsconfig from './aws-exports';
 Amplify.configure(awsconfig);
 
-async function gqlCreate (){
-console.log('create pressed')
-const userData = {
-  name:'Lucky',
-  email:'lucky008@gmail.com'
-}
-try{
-const userDetails = await API.graphql({query:mutations.createTodo, variables:{input:userData}})
-console.log(userDetails)
-}
-catch(error){
-  console.log(error)
-}
-}
-
-
-async function gqlRead (){
-console.log('Read pressed')
-const userDataRead = {
-  email:'lucky008@gmail.com'
-}
-try{
-const userDetailsRead = await API.graphql({query:queries.getTodo, variables:{email:userDataRead.email}})
-console.log(userDetailsRead.data.getTodo)
-}
-catch(error){
-  console.log(error)
-}
-}
-
-
-async function gqlUpdate (){
-console.log('Update pressed')
-const userDataUpdate = {
-  name:'Lucky_123',
-  email:'lucky008@gmail.com'
-}
-try{
-const userDetailsUpdate = await API.graphql({query:mutations.updateTodo, variables:{input:userDataUpdate}})
-console.log(userDetailsUpdate)
-}
-catch(error){
-  console.log(error)
-}
-}
-
-
-async function gqlDelete (){
-console.log('Delete pressed')
-const userDataDelete = {
-  email:'lucky008@gmail.com'
-}
-try{
-const userDetailsDelete = await API.graphql({query:mutations.deleteTodo, variables:{input:userDataDelete}})
-console.log(userDetailsDelete)
-}
-catch(error){
-  console.log(error)
-}
-}
-
-
 function App() {
+
+  const [name, setName] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [mail, setMail] = useState(null);
+  const [deletionMail, setDeletionMail] = useState(null);
+  const [updatedName, setUpdateName] = useState(null);
+
+  const userDetails = {
+    name: name,
+    email: email,
+    isAdmin: false
+  };
+
+  const addUser = async () => {
+    console.log('add pressed')
+    try {
+      const userData = await API.graphql({ query: mutations.createTodo, variables: { input: userDetails } })
+      console.log("Response is ", userData.data.createUser);
+    }
+    catch (error) {
+      console.log("error is", error);
+    }
+  }
+
+  const listUsers = async () => {
+    console.log('list pressed')
+    try {
+      const userData = await API.graphql({ query: queries.listTodos })
+      console.log("List is ", userData.data.items);
+    }
+    catch (error) {
+      console.log("error is", error);
+    }
+  }
+
+  const getSelectedUser = async () => {
+    console.log('get selected user pressed')
+    try {
+      const userData = await API.graphql({ query: queries.getTodo, variables: { email:userDetails.email } })
+      console.log("Selected user is ", userData.data.getTodo);
+    }
+    catch (error) {
+      console.log("error is", error);
+    }
+  } 
+  
+  const deletedMail = {
+    email:deletionMail
+  }
+
+  const deleteUser = async () => {
+    console.log('delete user pressed')
+    try {
+      const deletedUser = await API.graphql({ query: mutations.deleteTodo, variables: { input: deletedMail } })
+      console.log("Deleted user is ",deletedUser.data.deleteTodo);
+    }
+    catch (error) {
+      console.log("error is", error);
+    }
+  }
+
+  const updatedData = {
+    email:email,
+    name:updatedName,
+  }
+
+  const updateUser = async () => {
+    console.log('update pressed')
+    try {
+      const userData = await API.graphql({ query: mutations.updateTodo, variables: { input: updatedData } })
+      console.log("Response is ", userData.data.updateTodo);
+    }
+    catch (error) {
+      console.log("error is", error);
+    }
+  }
+
   return (
     <div className="App">
-    <button onClick={gqlCreate}>Create</button>
-    <button onClick={gqlRead}>Read</button>
-    <button onClick={gqlUpdate}>Update</button>
-    <button onClick={gqlDelete}>Delete</button>
+      <h1>Welcome </h1>
+      <input type='text' placeholder='Enter name' onChange={(name)=>setName(name.target.value)}/>
+      <input type='text' placeholder='Enter email' onChange={(email)=>setEmail(email.target.value)}/>
+      <div className='main-div'>
+        <button className='inner-div' onClick={()=>addUser()}>Add Data</button>
+        <button className='inner-div' onClick={()=>listUsers()}>Get Data</button>
+      </div>
+      <div className='main-div'>
+      <input className='inner-div' type='text' placeholder='Enter email for selected user' onChange={(usermail)=>setMail(usermail.target.value)}/>
+      <button className='inner-div' onClick={()=>getSelectedUser()}>Get all Data</button>
+      </div>
+      <div className='main-div'>
+      <input className='inner-div' type='text' placeholder='Enter email for deleting the user' onChange={(deletionMail)=>setDeletionMail(deletionMail.target.value)}/>
+      <button className='inner-div' onClick={()=>deleteUser()}>Delete user data</button>
+      </div>
+      <div className='main-div'>
+      <input className='inner-div' type='text' placeholder='Enter email for updating user' onChange={(email)=>setMail(email.target.value)}/>
+      <input className='inner-div' type='text' placeholder='Enter updated name' onChange={(updatedName)=>setUpdateName(updatedName.target.value)}/>
+      <button onClick={()=>updateUser()}>Update user data</button>
+      </div>
     </div>
   );
 }
