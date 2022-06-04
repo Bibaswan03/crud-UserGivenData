@@ -17,14 +17,13 @@ function App() {
   const userDetails = {
     name: name,
     email: email,
-    isAdmin: false
   };
 
-  const addUser = async () => {
+  const addUser = async (userDetails) => {
     console.log('add pressed')
     try {
       const userData = await API.graphql({ query: mutations.createTodo, variables: { input: userDetails } })
-      console.log("Response is ", userData.data.createUser);
+      console.log("Response is ", userData.data.createTodo);
     }
     catch (error) {
       console.log("error is", error);
@@ -35,7 +34,7 @@ function App() {
     console.log('list pressed')
     try {
       const userData = await API.graphql({ query: queries.listTodos })
-      console.log("List is ", userData.data.items);
+      console.log("List is ", userData.data);
     }
     catch (error) {
       console.log("error is", error);
@@ -69,11 +68,11 @@ function App() {
   }
 
   const updatedData = {
-    email:email,
+    email:mail,
     name:updatedName,
   }
 
-  const updateUser = async () => {
+  const updateUser = async (updatedData) => {
     console.log('update pressed')
     try {
       const userData = await API.graphql({ query: mutations.updateTodo, variables: { input: updatedData } })
@@ -90,7 +89,7 @@ function App() {
       <input type='text' placeholder='Enter name' onChange={(name)=>setName(name.target.value)}/>
       <input type='text' placeholder='Enter email' onChange={(email)=>setEmail(email.target.value)}/>
       <div className='main-div'>
-        <button className='inner-div' onClick={()=>addUser()}>Add Data</button>
+        <button className='inner-div' onClick={()=>addUser(userDetails)}>Add Data</button>
         <button className='inner-div' onClick={()=>listUsers()}>Get Data</button>
       </div>
       <div className='main-div'>
@@ -102,9 +101,9 @@ function App() {
       <button className='inner-div' onClick={()=>deleteUser()}>Delete user data</button>
       </div>
       <div className='main-div'>
-      <input className='inner-div' type='text' placeholder='Enter email for updating user' onChange={(email)=>setMail(email.target.value)}/>
+      <input className='inner-div' type='text' placeholder='Enter email for updating user' onChange={(mail)=>setMail(mail.target.value)}/>
       <input className='inner-div' type='text' placeholder='Enter updated name' onChange={(updatedName)=>setUpdateName(updatedName.target.value)}/>
-      <button onClick={()=>updateUser()}>Update user data</button>
+      <button onClick={()=>updateUser(updatedData)}>Update user data</button>
       </div>
     </div>
   );
